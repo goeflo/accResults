@@ -1,14 +1,15 @@
 package main
 
 import (
-	"accResults/config"
-	"accResults/internal/database"
-	"accResults/server"
 	"errors"
 	"flag"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/goeflo/accResults/config"
+	"github.com/goeflo/accResults/internal/database"
+	"github.com/goeflo/accResults/server"
 )
 
 func main() {

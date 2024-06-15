@@ -1,0 +1,6 @@
+
+http_server_addr = ":8080"
+
+data_dir = "./data/"
+
+sqlite_filename = "accResults.db"

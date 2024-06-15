@@ -1,14 +1,14 @@
 package server
 
 import (
-	"accResults/config"
-	"accResults/internal/data"
-	"accResults/internal/database"
-	"accResults/server/views"
 	"io"
 	"log/slog"
 	"net/http"
 
+	"github.com/goeflo/accResults/config"
+	"github.com/goeflo/accResults/internal/data"
+	"github.com/goeflo/accResults/internal/database"
+	"github.com/goeflo/accResults/server/views"
 	"github.com/gorilla/mux"
 )
 
