@@ -1,0 +1,29 @@
+package views
+
+templ MakeIndex() {
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <link rel="stylesheet" href="/static/simple.min.css" />
+        <link rel="stylesheet" href="/static/custom.css" />
+    </head>
+
+    <body>
+        @MakeHeader()
+
+        <main>
+        hallo idex page
+        </main>
+
+        @MakeFooter()
+    </body>
+    </html>
+}
+
+
+templ MakeFooter() {
+    <footer>
+    <p><a href="https://simplecss.org">simple.css</a> is licensed under the MIT license.</p>
+    </footer>
+}

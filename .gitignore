@@ -20,3 +20,9 @@
 # Go workspace file
 go.work
 go.work.sum
+
+# accResults data directory
+./data/
+
+# air build directory
+./tmp/
