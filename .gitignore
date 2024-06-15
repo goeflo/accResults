@@ -22,7 +22,7 @@ go.work
 go.work.sum
 
 # accResults data directory
-./data/
+data/*
 
 # air build directory
-./tmp/
+tmp/*
