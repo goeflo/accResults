@@ -23,7 +23,7 @@ func MakeUploadPage() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><link rel=\"stylesheet\" href=\"/static/simple.min.css\"><link rel=\"stylesheet\" href=\"/static/custom.css\"></head><body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><link rel=\"stylesheet\" href=\"/static/pico.min.css\"><link rel=\"stylesheet\" href=\"/static/custom.css\"></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -31,7 +31,7 @@ func MakeUploadPage() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main><form action=\"/upload\" id=\"upload-form\" method=\"post\" enctype=\"multipart/form-data\"><label>upload acc server result file</label> <input type=\"file\" id=\"race_result\" required name=\"race_result\" accept=\".json\"> <input type=\"submit\" value=\"upload\"></form></main>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<main class=\"container\"><form><fieldset class=\"grid\"><input type=\"file\" id=\"race_result\" required name=\"race_result\" accept=\".json\"> <input type=\"submit\" value=\"upload\"></fieldset></form></main>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

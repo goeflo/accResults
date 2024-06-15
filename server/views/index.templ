@@ -10,14 +10,14 @@ templ MakeIndex(races []database.Race) {
     <html lang="en">
 
     <head>
-        <link rel="stylesheet" href="/static/simple.min.css" />
+        <link rel="stylesheet" href="/static/pico.min.css" />
         <link rel="stylesheet" href="/static/custom.css" />
     </head>
 
     <body>
         @MakeHeader()
 
-        <main>
+        <main class="container">
         hallo idex page
 
         <table>
@@ -43,18 +43,11 @@ templ MakeIndex(races []database.Race) {
             </tbody>
         </table>
 
-        
-
         </main>
 
         @MakeFooter()
+
     </body>
     </html>
 }
 
-
-templ MakeFooter() {
-    <footer>
-    <p><a href="https://simplecss.org">simple.css</a> is licensed under the MIT license.</p>
-    </footer>
-}

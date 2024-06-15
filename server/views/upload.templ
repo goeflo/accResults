@@ -5,20 +5,23 @@ templ MakeUploadPage() {
     <html lang="en">
 
     <head>
-        <link rel="stylesheet" href="/static/simple.min.css" />
+        <link rel="stylesheet" href="/static/pico.min.css" />
         <link rel="stylesheet" href="/static/custom.css" />
     </head>
 
     <body>
         @MakeHeader()
 
-        <main>
+        <main class="container">
 
-        <form action="/upload" id="upload-form" method="post" enctype="multipart/form-data">
-            <label>upload acc server result file</label>
-            <input type="file" id="race_result" required name="race_result" accept=".json"/>
-            <input type="submit" value="upload">
+        <form>
+            <fieldset class="grid">
+                <input type="file" id="race_result" required name="race_result" accept=".json" />
+                <input type="submit" value="upload" />
+            </fieldset>
         </form>
+
+        
 
         </main>
 
