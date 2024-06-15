@@ -24,7 +24,7 @@ func NewServer(config *config.RaceResultConfig, db database.Database) Server {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/", handleHome).Methods("GET")
+	router.HandleFunc("/", handleHome(db)).Methods("GET")
 	router.HandleFunc("/upload", handleUploadForm).Methods("GET")
 	router.HandleFunc("/upload", handleUpload(config, db)).Methods("POST")
 
@@ -75,18 +75,37 @@ func handleUpload(c *config.RaceResultConfig, db database.Database) func(http.Re
 			http.Error(w, "result file was not saved "+err.Error(), http.StatusInternalServerError)
 		}
 
-		db.NewResult(result.Filename)
-		//fmt.Printf("result file %v\n", string(result))
+		if err := result.Read(result.Filename); err != nil {
+			slog.Error(err.Error())
+			http.Error(w, "can not read result file "+err.Error(), http.StatusInternalServerError)
+		}
 
+		db.NewResult(result)
+
+		races, err := db.GetRaces()
+		if err != nil {
+			slog.Error(err.Error())
+			http.Error(w, "can not read races data from db", http.StatusInternalServerError)
+		}
 		// TODO show upload result
-		views.MakeIndex().Render(r.Context(), w)
+		views.MakeIndex(races).Render(r.Context(), w)
 
 	}
 }
 
-func handleHome(w http.ResponseWriter, r *http.Request) {
-	slog.Info("handleHome ...")
-	views.MakeIndex().Render(r.Context(), w)
+func handleHome(db database.Database) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		slog.Info("handleHome ...")
+
+		races, err := db.GetRaces()
+		if err != nil {
+			slog.Error(err.Error())
+			http.Error(w, "can not read races data from db", http.StatusInternalServerError)
+		}
+
+		views.MakeIndex(races).Render(r.Context(), w)
+
+	}
 }
 
 func handleUploadForm(w http.ResponseWriter, r *http.Request) {

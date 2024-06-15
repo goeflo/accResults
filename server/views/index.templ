@@ -1,6 +1,11 @@
 package views
 
-templ MakeIndex() {
+import (
+    "fmt"
+	"github.com/goeflo/accResults/internal/database"
+)
+
+templ MakeIndex(races []database.Race) {
     <!DOCTYPE html>
     <html lang="en">
 
@@ -14,6 +19,32 @@ templ MakeIndex() {
 
         <main>
         hallo idex page
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>date</th>
+                    <th>session</th>
+                    <th>track</th>
+                    <th>server</th>
+                </tr>
+            </thead>
+            <tbody>
+                for _, race := range races {
+                    <tr>
+                        <td>{ fmt.Sprintf("%d", race.ID) }</td>
+                        <td>{ race.CreatedAt.Format("2006-01-02") }</td>
+                        <td>{ race.SessionType }</td>
+                        <td>{ race.Track }</td>
+                        <td>{ race.ServerName }</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        
+
         </main>
 
         @MakeFooter()
