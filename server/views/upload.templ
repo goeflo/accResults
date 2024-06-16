@@ -14,7 +14,7 @@ templ MakeUploadPage() {
 
         <main class="container">
 
-        <form>
+        <form action="upload" method="post" enctype="multipart/form-data">
             <fieldset class="grid">
                 <input type="file" id="race_result" required name="race_result" accept=".json" />
                 <input type="submit" value="upload" />

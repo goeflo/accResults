@@ -27,16 +27,20 @@ func TestDb(t *testing.T) {
 
 func TestCreateRace(t *testing.T) {
 	result := data.NewResult()
-	if err := result.Read("../../test/191003_235558_R.json"); err != nil {
-		t.Error(err)
-	}
+	err := result.Read("../../test/191003_235558_R.json")
+	assert.Nil(t, err)
 
 	db := NewSqlLite("test.db")
-	fmt.Printf("db filename: %v\n", db.filename)
 
-	if err := db.NewResult(result); err != nil {
-		t.Error(err)
-	}
+	resultID, err := db.NewResult(result)
+	assert.Nil(t, err)
+	assert.EqualValues(t, 1, resultID)
+
+	cars, err := db.GetCars(1)
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(cars))
+
+	//	fmt.Printf("%+v\n", cars)
 
 	os.Remove("test.db")
 

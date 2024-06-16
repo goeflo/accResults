@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 
@@ -13,6 +14,12 @@ import (
 )
 
 func main() {
+
+	// set log level
+	var accResultsLogLevel = new(slog.LevelVar)
+	accResultsLogLevel.Set(slog.LevelDebug)
+	h := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: accResultsLogLevel})
+	slog.SetDefault(slog.New(h))
 
 	// command line flag for configuration file
 	configfile := flag.String("config", "", "path to the config toml file")

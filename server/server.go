@@ -46,7 +46,7 @@ func (s Server) Run() {
 
 func handleUpload(c *config.RaceResultConfig, db database.Database) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		slog.Info("handleUpload ...")
+		slog.Debug("handleUpload ...")
 
 		r.Body = http.MaxBytesReader(w, r.Body, MAX_UPLOAD_SIZE)
 		if err := r.ParseMultipartForm(MAX_UPLOAD_SIZE); err != nil {
@@ -80,7 +80,11 @@ func handleUpload(c *config.RaceResultConfig, db database.Database) func(http.Re
 			http.Error(w, "can not read result file "+err.Error(), http.StatusInternalServerError)
 		}
 
-		db.NewResult(result)
+		_, err = db.NewResult(result)
+		if err != nil {
+			slog.Error(err.Error())
+			http.Error(w, "can not import race result into db", http.StatusInternalServerError)
+		}
 
 		races, err := db.GetRaces()
 		if err != nil {
@@ -95,7 +99,7 @@ func handleUpload(c *config.RaceResultConfig, db database.Database) func(http.Re
 
 func handleHome(db database.Database) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		slog.Info("handleHome ...")
+		slog.Debug("handleHome ...")
 
 		races, err := db.GetRaces()
 		if err != nil {
@@ -109,6 +113,6 @@ func handleHome(db database.Database) func(http.ResponseWriter, *http.Request) {
 }
 
 func handleUploadForm(w http.ResponseWriter, r *http.Request) {
-	slog.Info("handleUploadForm ...")
+	slog.Debug("handleUploadForm ...")
 	views.MakeUploadPage().Render(r.Context(), w)
 }

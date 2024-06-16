@@ -26,3 +26,6 @@ data/*
 
 # air build directory
 tmp/*
+
+# makefile dir
+bin/*
