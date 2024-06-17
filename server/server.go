@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -27,6 +28,7 @@ func NewServer(config *config.RaceResultConfig, db database.Database) Server {
 	router.HandleFunc("/", handleHome(db)).Methods("GET")
 	router.HandleFunc("/upload", handleUploadForm).Methods("GET")
 	router.HandleFunc("/upload", handleUpload(config, db)).Methods("POST")
+	router.HandleFunc("/details/{raceID}", handleDetails(config, db)).Methods("POST")
 
 	// handle all static content
 	router.PathPrefix("/static/").Handler(
@@ -42,6 +44,19 @@ func NewServer(config *config.RaceResultConfig, db database.Database) Server {
 func (s Server) Run() {
 	slog.Info("starting http server", "addr", s.Config.HttpServerAddr)
 	http.ListenAndServe(s.Config.HttpServerAddr, s.Router)
+}
+
+func handleDetails(c *config.RaceResultConfig, db database.Database) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		slog.Debug("handleDetails ...")
+		params := mux.Vars(r)
+		raceID := params["raceID"]
+
+		fmt.Printf("url %v\n", r.URL)
+		fmt.Printf("raceID %v\n", raceID)
+
+		views.MakeDetailsPage().Render(r.Context(), w)
+	}
 }
 
 func handleUpload(c *config.RaceResultConfig, db database.Database) func(http.ResponseWriter, *http.Request) {

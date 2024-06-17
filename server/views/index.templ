@@ -19,8 +19,8 @@ templ MakeIndex(races []database.Race) {
         @MakeHeader()
 
         <main class="container">
-        hallo idex page
 
+        <div id="content">
         <table>
             <thead>
                 <tr>
@@ -34,7 +34,10 @@ templ MakeIndex(races []database.Race) {
             <tbody>
                 for _, race := range races {
                     <tr>
-                        <td>{ fmt.Sprintf("%d", race.ID) }</td>
+                        <td>
+                            <a hx-target="#content" hx-post={fmt.Sprintf("/details/%d", race.ID)} class="contrast">
+                            { fmt.Sprintf("%d", race.ID) }</a>
+                        </td>
                         <td>{ race.CreatedAt.Format("2006-01-02") }</td>
                         <td>{ race.SessionType }</td>
                         <td>{ race.Track }</td>
@@ -43,6 +46,7 @@ templ MakeIndex(races []database.Race) {
                 }
             </tbody>
         </table>
+        </div>
 
         </main>
 

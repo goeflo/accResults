@@ -28,8 +28,9 @@ type Car struct {
 
 type LeaderBoard struct {
 	gorm.Model
-	RaceID         uint `gorm:"index"`
-	DriverID       uint
+	RaceID uint `gorm:"index"`
+	CarID  uint
+	//DriverID       uint
 	LapCount       uint
 	LastLaptime    uint
 	BestLaptime    uint

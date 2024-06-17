@@ -85,6 +85,26 @@ func (s SqlLite) NewResult(data data.Result) (ID uint, err error) {
 				return 0, err
 			}
 		}
+
+		lb := LeaderBoard{
+			RaceID:      race.ID,
+			CarID:       race.ID,
+			LapCount:    leaderboardline.Timing.LapCount,
+			LastLaptime: leaderboardline.Timing.LastLap,
+			BestLaptime: leaderboardline.Timing.BestLap,
+			Totaltime:   leaderboardline.Timing.TotalTime,
+		}
+		if leaderboardline.MissingMandatoryPitstop == 0 {
+			lb.MissingPitstop = false
+		} else {
+			lb.MissingPitstop = true
+		}
+
+		if result := s.db.Create(&lb); result.Error != nil {
+			slog.Error("error adding new leaderboard", "err", result.Error)
+			return 0, result.Error
+		}
+
 	}
 	return resultFile.ID, nil
 }
