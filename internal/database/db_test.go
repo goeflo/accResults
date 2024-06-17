@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -9,10 +8,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDb(t *testing.T) {
+var db SqlLite
+var result data.Result
 
-	db := NewSqlLite("test.db")
-	fmt.Printf("db filename: %v\n", db.filename)
+func TestMain(m *testing.M) {
+	db = NewSqlLite("test.db")
+	defer os.Remove("test.db")
+
+	result = data.NewResult()
+	result.Read("../../test/191003_235558_R.json")
+	db.NewResult(result)
+
+	os.Exit(m.Run())
+
+}
+func TestDb(t *testing.T) {
 
 	db.db.Create(&ResultFile{Filename: "kermit"})
 	db.db.Create(&ResultFile{Filename: "piggy"})
@@ -22,26 +32,19 @@ func TestDb(t *testing.T) {
 	assert.Nil(t, result.Error)
 	assert.Equal(t, "kermit", resultFile.Filename)
 
-	os.Remove("test.db")
 }
 
+func TestLeaderboard(t *testing.T) {
+
+	lb, err := db.GetLeaderboard(1)
+	assert.Nil(t, err)
+
+	assert.Equal(t, 3, len(lb))
+	assert.Equal(t, result.ResultData.SessionResult.LeaderBoardLines[0].Timing.TotalTime, lb[0].Totaltime)
+
+}
 func TestCreateRace(t *testing.T) {
-	result := data.NewResult()
-	err := result.Read("../../test/191003_235558_R.json")
-	assert.Nil(t, err)
-
-	db := NewSqlLite("test.db")
-
-	resultID, err := db.NewResult(result)
-	assert.Nil(t, err)
-	assert.EqualValues(t, 1, resultID)
-
 	cars, err := db.GetCars(1)
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(cars))
-
-	//	fmt.Printf("%+v\n", cars)
-
-	os.Remove("test.db")
-
 }

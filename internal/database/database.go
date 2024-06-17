@@ -14,6 +14,7 @@ type Database interface {
 	GetCars(raceID uint) ([]Car, error)
 	AddDriver(driver Driver) error
 	GetDriver(ID uint) (*Driver, error)
+	GetLeaderboard(raceID uint) ([]LeaderBoard, error)
 }
 
 type SqlLite struct {
@@ -107,6 +108,13 @@ func (s SqlLite) NewResult(data data.Result) (ID uint, err error) {
 
 	}
 	return resultFile.ID, nil
+}
+
+func (s SqlLite) GetLeaderboard(raceID uint) (leaderbord []LeaderBoard, err error) {
+	if result := s.db.Order("lap_count desc, totaltime").Where(&LeaderBoard{RaceID: raceID}).Find(&leaderbord); result.Error != nil {
+		return nil, result.Error
+	}
+	return leaderbord, nil
 }
 
 func (s SqlLite) AddDriver(driver Driver) error {
