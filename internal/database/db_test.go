@@ -28,7 +28,7 @@ func TestDb(t *testing.T) {
 	db.db.Create(&ResultFile{Filename: "piggy"})
 
 	resultFile := ResultFile{}
-	result := db.db.First(&resultFile, 1)
+	result := db.db.First(&resultFile, 2)
 	assert.Nil(t, result.Error)
 	assert.Equal(t, "kermit", resultFile.Filename)
 
