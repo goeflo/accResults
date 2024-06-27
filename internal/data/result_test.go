@@ -20,6 +20,6 @@ func TestResult(t *testing.T) {
 	fmt.Printf("laptime: %v\n", r.ResultData.Laps[0].Laptime)
 	//fmt.Printf("laptime: %v\n", r.ResultData.Laps[0].Laptime/1000)
 
-	fmt.Printf("%v\n", convertMilliseconds(r.ResultData.Laps[0].Laptime))
+	fmt.Printf("%v\n", ConvertMilliseconds(r.ResultData.Laps[0].Laptime))
 
 }

@@ -44,7 +44,7 @@ func TestLeaderboard(t *testing.T) {
 
 }
 func TestCreateRace(t *testing.T) {
-	cars, err := db.GetCars(1)
+	cars, err := db.GetCarsForRace(1)
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(cars))
 }

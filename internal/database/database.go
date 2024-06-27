@@ -1,6 +1,8 @@
 package database
 
 import (
+	"fmt"
+	"log"
 	"log/slog"
 
 	"github.com/goeflo/accResults/internal/data"
@@ -68,19 +70,20 @@ func (s SqlLite) NewResult(data data.Result) (ID uint, err error) {
 		}
 
 		for _, driver := range leaderboardline.Car.Drivers {
-			if err := s.AddDriver(Driver{
+			dr := &Driver{
 				CarID:     car.ID,
 				FirstName: driver.FirstName,
 				LastName:  driver.LastName,
 				ShortName: driver.ShortName,
-			}); err != nil {
+			}
+			if err := s.AddDriver(dr); err != nil {
 				return 0, err
 			}
 		}
 
 		lb := LeaderBoard{
 			RaceID:      race.ID,
-			CarID:       race.ID,
+			CarID:       car.ID,
 			LapCount:    leaderboardline.Timing.LapCount,
 			LastLaptime: leaderboardline.Timing.LastLap,
 			BestLaptime: leaderboardline.Timing.BestLap,
@@ -105,14 +108,17 @@ func (s SqlLite) GetLeaderboard(raceID uint) (leaderbord []LeaderBoard, err erro
 	if result := s.db.Order("lap_count desc, totaltime").Where(&LeaderBoard{RaceID: raceID}).Find(&leaderbord); result.Error != nil {
 		return nil, result.Error
 	}
+	for i := range leaderbord {
+		fmt.Printf("%v laps:%v, total time:%v\n", i, leaderbord[i].LapCount, leaderbord[i].Totaltime)
+	}
 	return leaderbord, nil
 }
 
-func (s SqlLite) AddDriver(driver Driver) error {
-	slog.Debug("add new driver", "shortName", driver.ShortName)
-	if result := s.db.Create(&driver); result.Error != nil {
+func (s SqlLite) AddDriver(driver *Driver) error {
+	if result := s.db.Create(driver); result.Error != nil {
 		return result.Error
 	}
+	log.Printf("new driver ID:%v, Sortname:%v\n", driver.ID, driver.ShortName)
 	return nil
 }
 
@@ -124,7 +130,24 @@ func (s SqlLite) GetDriver(ID uint) (driver *Driver, err error) {
 
 }
 
-func (s SqlLite) GetCars(raceID uint) (cars []Car, err error) {
+func (s SqlLite) GetDriverOnCar(carID uint) (driver *Driver, err error) {
+	driver = &Driver{}
+	if result := s.db.Where(&Driver{CarID: carID}).Find(&driver); result.Error != nil {
+		return nil, result.Error
+	}
+	return driver, nil
+
+}
+
+func (s SqlLite) GetCar(ID uint) (car *Car, err error) {
+	car = &Car{}
+	if result := s.db.First(car, ID); result.Error != nil {
+		return nil, result.Error
+	}
+	return car, nil
+}
+
+func (s SqlLite) GetCarsForRace(raceID uint) (cars []Car, err error) {
 	if result := s.db.Where(&Car{RaceID: raceID}).Find(&cars); result.Error != nil {
 		return nil, result.Error
 	}

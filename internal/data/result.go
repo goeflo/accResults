@@ -81,7 +81,7 @@ func (r *Result) Read(filename string) error {
 	return nil
 }
 
-func convertMilliseconds(milliseconds uint) string {
+func ConvertMilliseconds(milliseconds uint) string {
 
 	d := time.Duration(milliseconds) * time.Millisecond
 

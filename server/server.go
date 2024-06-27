@@ -66,14 +66,50 @@ func handleDetails(c *config.RaceResultConfig, db database.SqlLite) func(http.Re
 		}
 
 		lb, err := db.GetLeaderboard(uint(raceID))
-		fmt.Printf("lb size %v\n", len(lb))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			fmt.Printf("error getting leaderboard %v\n", err)
 			return
 		}
+
+		pageLbs := []views.Leaderboard{}
+		for i, line := range lb {
+
+			car, err := db.GetCar(line.CarID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				fmt.Printf("error getting carID %v %v\n", line.CarID, err)
+				return
+			}
+
+			driver, err := db.GetDriverOnCar(car.ID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				fmt.Printf("error getting driverID %v %v\n", car.ID, err)
+				return
+			}
+
+			gap := uint(0)
+			if i > 0 {
+				gap = lb[i].Totaltime - lb[i-1].Totaltime
+			}
+			fmt.Printf("totaltime %v, gap %v\n", lb[i].Totaltime, gap)
+
+			pageLbs = append(pageLbs, views.Leaderboard{
+				CarID:    line.CarID,
+				DriverID: driver.ID,
+				No:       car.RaceNumber,
+				Pos:      uint(i + 1),
+				Driver:   fmt.Sprintf("%s %s", driver.FirstName, driver.LastName),
+				Laps:     line.LapCount,
+				Gap:      data.ConvertMilliseconds(gap),
+				Bestlap:  data.ConvertMilliseconds(line.BestLaptime),
+				Vehicle:  data.Cars[car.CarModel].Name,
+			})
+
+		}
 		fmt.Printf("race track %v\n", race.Track)
-		views.MakeDetailsPage(race, lb).Render(r.Context(), w)
+		views.MakeDetailsPage(race, pageLbs).Render(r.Context(), w)
 	}
 }
 

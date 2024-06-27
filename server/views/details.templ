@@ -6,7 +6,7 @@ import (
 )
 
 
-templ MakeDetailsPage(race *database.Race, lbs []database.LeaderBoard) {
+templ MakeDetailsPage(race *database.Race, lbs []Leaderboard) {
 
 
     <a hx-target="#content" href="/" class="contrast">
@@ -14,36 +14,56 @@ templ MakeDetailsPage(race *database.Race, lbs []database.LeaderBoard) {
         back
     </a>
 
+    <details class="dropdown">
+        <summary role="button" class="outline contrast">select details</summary>
+        <ul>
+            <li>result</li>
+            <li>laps</li>
+            <li>best laps</li>
+            <li>consitency</li>
+            <li>sectors</li>
+        </ul>
+    </details>
+
     <table>
         <tbody>
             <tr>
                 <td>track</td>
-                <td>{ fmt.Sprintf("Track %v\n", race.Track) }</td>
+                <td>{ fmt.Sprintf("%v\n", race.Track) }</td>
             </tr>
             <tr>
                 <td>server</td>
-                <td>{ fmt.Sprintf("Server %v\n", race.ServerName) }</td>
+                <td>{ fmt.Sprintf("%v\n", race.ServerName) }</td>
+            </tr>
+            <tr>
+                <td>session</td>
+                <td>{ fmt.Sprintf("%v\n", race.SessionType) }</td>
             </tr>
         </tbody>
     </table>
-    
+
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>date</th>
-                <th>session</th>
-                <th>track</th>
-                <th>server</th>
+                <th>pos</th>
+                <th>no</th>
+                <th>driver</th>
+                <th>verhicle</th>
+                <th>laps</th>
+                <th>best lap</th>
+                <th>gap</th>
             </tr>
         </thead>
         <tbody>
             for _, lb := range lbs {
                 <tr>
-                    <td>{ fmt.Sprintf("%d", lb.RaceID) }</td>
-                    <td>{ fmt.Sprintf("%d", lb.CarID) }</td>
-                    <td>{ fmt.Sprintf("%d", lb.LapCount) }</td>
-                    <td>{ fmt.Sprintf("%d", lb.Totaltime) }</td>
+                    <td>{ fmt.Sprintf("%d", lb.Pos) }</td>
+                    <td>{ fmt.Sprintf("%d", lb.No) }</td>
+                    <td>{ fmt.Sprintf("%s", lb.Driver) }</td>
+                    <td>{ fmt.Sprintf("%s", lb.Vehicle) }</td>
+                    <td>{ fmt.Sprintf("%d", lb.Laps) }</td>
+                    <td>{ fmt.Sprintf("%s", lb.Bestlap) }</td>
+                    <td>{ fmt.Sprintf("%s", lb.Gap) }</td>
                 </tr>
             }
         </tbody>
