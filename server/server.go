@@ -5,6 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strconv"
 
 	"github.com/goeflo/accResults/config"
 	"github.com/goeflo/accResults/internal/data"
@@ -14,14 +15,14 @@ import (
 )
 
 type Server struct {
-	DB     database.Database
+	DB     database.SqlLite
 	Config *config.RaceResultConfig
 	Router *mux.Router
 }
 
 const MAX_UPLOAD_SIZE = 1024 * 1024 // 1MB
 
-func NewServer(config *config.RaceResultConfig, db database.Database) Server {
+func NewServer(config *config.RaceResultConfig, db database.SqlLite) Server {
 
 	router := mux.NewRouter()
 
@@ -46,20 +47,37 @@ func (s Server) Run() {
 	http.ListenAndServe(s.Config.HttpServerAddr, s.Router)
 }
 
-func handleDetails(c *config.RaceResultConfig, db database.Database) func(http.ResponseWriter, *http.Request) {
+func handleDetails(c *config.RaceResultConfig, db database.SqlLite) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Debug("handleDetails ...")
 		params := mux.Vars(r)
-		raceID := params["raceID"]
+		raceID, err := strconv.Atoi(params["raceID"])
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			fmt.Printf("%v\n", err)
+			return
+		}
 
-		fmt.Printf("url %v\n", r.URL)
-		fmt.Printf("raceID %v\n", raceID)
+		race, err := db.GetRace(uint(raceID))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			fmt.Printf("error getting race %v\n", err)
+			return
+		}
 
-		views.MakeDetailsPage().Render(r.Context(), w)
+		lb, err := db.GetLeaderboard(uint(raceID))
+		fmt.Printf("lb size %v\n", len(lb))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			fmt.Printf("error getting leaderboard %v\n", err)
+			return
+		}
+		fmt.Printf("race track %v\n", race.Track)
+		views.MakeDetailsPage(race, lb).Render(r.Context(), w)
 	}
 }
 
-func handleUpload(c *config.RaceResultConfig, db database.Database) func(http.ResponseWriter, *http.Request) {
+func handleUpload(c *config.RaceResultConfig, db database.SqlLite) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Debug("handleUpload ...")
 
@@ -112,7 +130,7 @@ func handleUpload(c *config.RaceResultConfig, db database.Database) func(http.Re
 	}
 }
 
-func handleHome(db database.Database) func(http.ResponseWriter, *http.Request) {
+func handleHome(db database.SqlLite) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Debug("handleHome ...")
 

@@ -5,22 +5,7 @@ import (
 	"github.com/goeflo/accResults/internal/database"
 )
 
-templ MakeIndex(races []database.Race) {
-    <!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <link rel="stylesheet" href="/static/pico.min.css" />
-        <link rel="stylesheet" href="/static/custom.css" />
-        <script src="/static/htmx.min.js" />
-    </head>
-
-    <body>
-        @MakeHeader()
-
-        <main class="container">
-
-        <div id="content">
+templ MakeIndexPage(races []database.Race) {
         <table>
             <thead>
                 <tr>
@@ -46,12 +31,27 @@ templ MakeIndex(races []database.Race) {
                 }
             </tbody>
         </table>
-        </div>
+}
 
+templ MakeIndex(races []database.Race) {
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <link rel="stylesheet" href="/static/pico.min.css" />
+        <link rel="stylesheet" href="/static/custom.css" />
+        <script src="/static/htmx.min.js" />
+        <meta name="htmx-config" content='{code:".*", swap:true},'  />
+    </head>
+
+    <body>
+        @MakeHeader()
+        <main class="container">
+            <div id="content">
+                @MakeIndexPage(races)
+            </div>
         </main>
-
         @MakeFooter()
-
     </body>
     </html>
 }

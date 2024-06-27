@@ -8,15 +8,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type Database interface {
-	NewResult(data data.Result) (uint, error)
-	GetRaces() ([]Race, error)
-	GetCars(raceID uint) ([]Car, error)
-	AddDriver(driver Driver) error
-	GetDriver(ID uint) (*Driver, error)
-	GetLeaderboard(raceID uint) ([]LeaderBoard, error)
-}
-
 type SqlLite struct {
 	filename string
 	db       *gorm.DB
@@ -145,4 +136,12 @@ func (s SqlLite) GetRaces() (races []Race, err error) {
 		return nil, result.Error
 	}
 	return races, nil
+}
+
+func (s SqlLite) GetRace(ID uint) (race *Race, err error) {
+	race = &Race{}
+	if result := s.db.First(race, ID); result.Error != nil {
+		return nil, result.Error
+	}
+	return race, nil
 }

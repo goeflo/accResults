@@ -1,6 +1,53 @@
 package views
 
+import (
+    "fmt"
+    "github.com/goeflo/accResults/internal/database"
+)
 
-templ MakeDetailsPage() {
-    <p>race details</p>
+
+templ MakeDetailsPage(race *database.Race, lbs []database.LeaderBoard) {
+
+
+    <a hx-target="#content" href="/" class="contrast">
+        <img src="/static/back-arrow.png" height="30px" width="30px">
+        back
+    </a>
+
+    <table>
+        <tbody>
+            <tr>
+                <td>track</td>
+                <td>{ fmt.Sprintf("Track %v\n", race.Track) }</td>
+            </tr>
+            <tr>
+                <td>server</td>
+                <td>{ fmt.Sprintf("Server %v\n", race.ServerName) }</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>date</th>
+                <th>session</th>
+                <th>track</th>
+                <th>server</th>
+            </tr>
+        </thead>
+        <tbody>
+            for _, lb := range lbs {
+                <tr>
+                    <td>{ fmt.Sprintf("%d", lb.RaceID) }</td>
+                    <td>{ fmt.Sprintf("%d", lb.CarID) }</td>
+                    <td>{ fmt.Sprintf("%d", lb.LapCount) }</td>
+                    <td>{ fmt.Sprintf("%d", lb.Totaltime) }</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
 }
