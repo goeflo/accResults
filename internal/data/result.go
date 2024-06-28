@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log/slog"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -35,7 +35,7 @@ func (r *Result) Store(dataDir string, data []byte) error {
 
 	r.Filename = filepath.Join(weekDirName, uuid.New().String()+".json")
 
-	slog.Info("save result", "filename", r.Filename)
+	log.Printf("save result file: %v\n", r.Filename)
 	if err := os.WriteFile(r.Filename, data, 0644); err != nil {
 		return err
 	}

@@ -9,6 +9,7 @@ templ MakeIndexPage(races []database.Race) {
         <table>
             <thead>
                 <tr>
+                    <th></th>
                     <th>ID</th>
                     <th>date</th>
                     <th>session</th>
@@ -18,10 +19,14 @@ templ MakeIndexPage(races []database.Race) {
             </thead>
             <tbody>
                 for _, race := range races {
-                    <tr>
+                    <tr class="striped" class="clickable" hx-target="#content" hx-post={fmt.Sprintf("/details/%d", race.ID)}>
                         <td>
-                            <a hx-target="#content" hx-post={fmt.Sprintf("/details/%d", race.ID)} class="contrast">
-                            { fmt.Sprintf("%d", race.ID) }</a>
+                            
+                            <img src="/static/info.png" width="40" heigh="40">
+                        </td>
+                        <td>
+                            
+                            { fmt.Sprintf("%d", race.ID) }
                         </td>
                         <td>{ race.CreatedAt.Format("2006-01-02") }</td>
                         <td>{ race.SessionType }</td>

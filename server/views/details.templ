@@ -3,46 +3,62 @@ package views
 import (
     "fmt"
     "github.com/goeflo/accResults/internal/database"
+    "github.com/goeflo/accResults/server/model"
 )
 
+templ MakeDetailsHeader(race *database.Race) {
 
-templ MakeDetailsPage(race *database.Race, lbs []Leaderboard) {
-
-
-    <a hx-target="#content" href="/" class="contrast">
+    <p>
+    <a hx-target="#content" href="/">
         <img src="/static/back-arrow.png" height="30px" width="30px">
         back
     </a>
+    </p>
 
+    <p>
     <details class="dropdown">
-        <summary role="button" class="outline contrast">select details</summary>
+        <summary role="button" class="">select details</summary>
         <ul>
-            <li>result</li>
-            <li>laps</li>
+            <li><a hx-target="#content" hx-post={fmt.Sprintf("/details/%d", race.ID)}>result</a></li>
+            <li><a hx-target="#content" hx-post={fmt.Sprintf("/details/%d/laps", race.ID)}>laps</a></li>
             <li>best laps</li>
             <li>consitency</li>
             <li>sectors</li>
         </ul>
     </details>
+    </p>
 
+}
+
+templ MakeDetailsLaps(race *database.Race) {
+    @MakeDetailsHeader(race)
+}
+
+templ MakeDetailsResultPage(race *database.Race, lbs []model.Leaderboard) {
+
+    @MakeDetailsHeader(race)
+    
+    <p>
     <table>
         <tbody>
             <tr>
-                <td>track</td>
+                <td><b>track</b></td>
                 <td>{ fmt.Sprintf("%v\n", race.Track) }</td>
             </tr>
             <tr>
-                <td>server</td>
+                <td><b>server</b></td>
                 <td>{ fmt.Sprintf("%v\n", race.ServerName) }</td>
             </tr>
             <tr>
-                <td>session</td>
+                <td><b>session</b></td>
                 <td>{ fmt.Sprintf("%v\n", race.SessionType) }</td>
             </tr>
         </tbody>
     </table>
+    </p>
 
-    <table>
+    <p>
+    <table class="striped">
         <thead>
             <tr>
                 <th>pos</th>
@@ -50,8 +66,9 @@ templ MakeDetailsPage(race *database.Race, lbs []Leaderboard) {
                 <th>driver</th>
                 <th>verhicle</th>
                 <th>laps</th>
-                <th>best lap</th>
+                <th>total time</th>
                 <th>gap</th>
+                <th>best lap</th>
             </tr>
         </thead>
         <tbody>
@@ -62,12 +79,13 @@ templ MakeDetailsPage(race *database.Race, lbs []Leaderboard) {
                     <td>{ fmt.Sprintf("%s", lb.Driver) }</td>
                     <td>{ fmt.Sprintf("%s", lb.Vehicle) }</td>
                     <td>{ fmt.Sprintf("%d", lb.Laps) }</td>
-                    <td>{ fmt.Sprintf("%s", lb.Bestlap) }</td>
+                    <td>{ fmt.Sprintf("%s", lb.Totaltime) }</td>
                     <td>{ fmt.Sprintf("%s", lb.Gap) }</td>
+                    <td>{ fmt.Sprintf("%s", lb.Bestlap) }</td>
                 </tr>
             }
         </tbody>
     </table>
-
+    </p>
 
 }

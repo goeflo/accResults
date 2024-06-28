@@ -54,4 +54,7 @@ type Lap struct {
 	Laptime  uint
 	IsValid  bool
 	Splits   string
+	Split1   uint
+	Split2   uint
+	Split3   uint
 }

@@ -1,9 +1,7 @@
 package database
 
 import (
-	"fmt"
 	"log"
-	"log/slog"
 
 	"github.com/goeflo/accResults/internal/data"
 	"gorm.io/driver/sqlite"
@@ -34,8 +32,10 @@ func NewSqlLite(filename string) SqlLite {
 
 func (s SqlLite) NewResult(data data.Result) (ID uint, err error) {
 	resultFile := ResultFile{Filename: data.Filename}
+	log.Printf("adding new results ...")
 
-	slog.Info("process new results", "serverName", data.ResultData.ServerName)
+	accCarIDToDriverID := make(map[uint]uint)
+	accCarIDToDBCarID := make(map[uint]uint)
 
 	if result := s.db.Create(&resultFile); result.Error != nil {
 		return 0, result.Error
@@ -52,8 +52,6 @@ func (s SqlLite) NewResult(data data.Result) (ID uint, err error) {
 		return 0, result.Error
 	}
 
-	slog.Info("leaderboard", "size", len(data.ResultData.SessionResult.LeaderBoardLines))
-
 	for _, leaderboardline := range data.ResultData.SessionResult.LeaderBoardLines {
 		car := Car{
 			RaceID:         race.ID,
@@ -65,9 +63,11 @@ func (s SqlLite) NewResult(data data.Result) (ID uint, err error) {
 		}
 
 		if result := s.db.Create(&car); result.Error != nil {
-			slog.Error("error adding new car", "err", result.Error)
+			log.Printf("error adding new car %v, %v\n", car, result.Error)
 			return 0, result.Error
 		}
+
+		accCarIDToDBCarID[leaderboardline.Car.CarID] = car.ID
 
 		for _, driver := range leaderboardline.Car.Drivers {
 			dr := &Driver{
@@ -76,9 +76,12 @@ func (s SqlLite) NewResult(data data.Result) (ID uint, err error) {
 				LastName:  driver.LastName,
 				ShortName: driver.ShortName,
 			}
+
 			if err := s.AddDriver(dr); err != nil {
 				return 0, err
 			}
+
+			accCarIDToDriverID[car.AccResultCarID] = dr.ID
 		}
 
 		lb := LeaderBoard{
@@ -96,10 +99,25 @@ func (s SqlLite) NewResult(data data.Result) (ID uint, err error) {
 		}
 
 		if result := s.db.Create(&lb); result.Error != nil {
-			slog.Error("error adding new leaderboard", "err", result.Error)
+			log.Printf("error adding new leaderboard %v, %v\n", lb, result.Error)
 			return 0, result.Error
 		}
+	}
 
+	for _, lap := range data.ResultData.Laps {
+		l := Lap{
+			CarID:    accCarIDToDBCarID[lap.CarID],
+			DriverID: accCarIDToDriverID[lap.CarID],
+			Laptime:  lap.Laptime,
+			IsValid:  lap.IsValidForBest,
+			Split1:   lap.Splits[0],
+			Split2:   lap.Splits[1],
+			Split3:   lap.Splits[2],
+		}
+		if result := s.db.Create(&l); result.Error != nil {
+			log.Printf("error adding new lap %v, %v\n", l, result.Error)
+			return 0, result.Error
+		}
 	}
 	return resultFile.ID, nil
 }
@@ -109,7 +127,7 @@ func (s SqlLite) GetLeaderboard(raceID uint) (leaderbord []LeaderBoard, err erro
 		return nil, result.Error
 	}
 	for i := range leaderbord {
-		fmt.Printf("%v laps:%v, total time:%v\n", i, leaderbord[i].LapCount, leaderbord[i].Totaltime)
+		log.Printf("%v laps:%v, total time:%v\n", i, leaderbord[i].LapCount, leaderbord[i].Totaltime)
 	}
 	return leaderbord, nil
 }
@@ -118,16 +136,19 @@ func (s SqlLite) AddDriver(driver *Driver) error {
 	if result := s.db.Create(driver); result.Error != nil {
 		return result.Error
 	}
-	log.Printf("new driver ID:%v, Sortname:%v\n", driver.ID, driver.ShortName)
+	log.Printf("new driver ID:%v, Shortname:%v\n", driver.ID, driver.ShortName)
 	return nil
 }
+
+//func (s SqlLite) GetDriverInRace(raceID uint) (driver []Driver, err error) {
+//s.db.Where()
+//}
 
 func (s SqlLite) GetDriver(ID uint) (driver *Driver, err error) {
 	if result := s.db.First(driver, ID); result.Error != nil {
 		return nil, result.Error
 	}
 	return driver, nil
-
 }
 
 func (s SqlLite) GetDriverOnCar(carID uint) (driver *Driver, err error) {
