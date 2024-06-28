@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -52,42 +53,78 @@ func (s Server) Run() {
 func handleDetailsLaps(db database.SqlLite) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("handleDetailsLaps...")
-		/*
-			params := mux.Vars(r)
-			raceID, err := strconv.Atoi(params["raceID"])
+
+		params := mux.Vars(r)
+		raceID, err := strconv.Atoi(params["raceID"])
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("%v\n", err)
+			return
+		}
+
+		race, err := db.GetRace(uint(raceID))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("error getting race %v\n", err)
+			return
+		}
+
+		cars, err := db.GetCarsForRace(race.ID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("error getting cars for race %v %v\n", race.ID, err)
+			return
+		}
+
+		drivers := []model.Driver{}
+		for _, car := range cars {
+			driver, err := db.GetDriverOnCar(car.ID)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
-				log.Printf("%v\n", err)
+				log.Printf("error getting driver on car %v %v\n", car.ID, err)
 				return
 			}
 
-			race, err := db.GetRace(uint(raceID))
+			laps, err := db.GetLapsForDriver(driver.ID)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
-				log.Printf("error getting race %v\n", err)
+				log.Printf("error getting laps for driver %v %v\n", driver.ID, err)
 				return
 			}
-
-			cars, err := db.GetCarsForRace(race.ID)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				log.Printf("error getting cars for race %v %v\n", race.ID, err)
-				return
+			mdriver := model.Driver{
+				Firstname: driver.FirstName,
+				Lastname:  driver.LastName,
+				Shortname: driver.ShortName,
+				Vehicle:   data.Cars[car.CarModel].Name,
 			}
 
-			divers := []data.Driver{}
-			for _, car := range cars {
-				driver, err := db.GetDriverOnCar(car.ID)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					log.Printf("error getting driver on car %v %v\n", car.ID, err)
-					return
+			fastestLap := uint(math.MaxInt)
+			for i, lap := range laps {
+				mlap := model.Lap{
+					Lap:     uint(i + 1),
+					Sector1: data.ConvertMilliseconds(lap.Split1),
+					Sector2: data.ConvertMilliseconds(lap.Split2),
+					Sector3: data.ConvertMilliseconds(lap.Split3),
 				}
 
-				laps, err := db.GetLaps()
+				if lap.IsValid && lap.Laptime < fastestLap {
+					fastestLap = lap.Laptime
+					mdriver.FastestLap = uint(i)
+				}
 
-			}*/
-		//views.MakeDetailsLaps(race).Render(r.Context(), w)
+				if lap.IsValid {
+					mlap.Time = data.ConvertMilliseconds(lap.Laptime)
+				} else {
+					mlap.Time = fmt.Sprintf("%v (invalid)", data.ConvertMilliseconds(lap.Laptime))
+				}
+				mdriver.Laps = append(mdriver.Laps, mlap)
+
+			}
+			fmt.Printf("fastes lap time driver %v, lap %v\n", mdriver.Shortname, mdriver.FastestLap)
+			drivers = append(drivers, mdriver)
+		}
+
+		views.MakeDetailsLaps(race, drivers).Render(r.Context(), w)
 
 	}
 }

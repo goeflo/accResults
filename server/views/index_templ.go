@@ -28,19 +28,19 @@ func MakeIndexPage(races []database.Race) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<table><thead><tr><th></th><th>ID</th><th>date</th><th>session</th><th>track</th><th>server</th></tr></thead> <tbody>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<table class=\"striped\"><thead><tr><th></th><th>ID</th><th>date</th><th>session</th><th>track</th><th>server</th></tr></thead> <tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, race := range races {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<tr class=\"striped\" class=\"clickable\" hx-target=\"#content\" hx-post=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<tr class=\"clickable\" hx-target=\"#content\" hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/details/%d", race.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 22, Col: 123}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `index.templ`, Line: 22, Col: 107}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -140,7 +140,7 @@ func MakeIndex(races []database.Race) templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><link rel=\"stylesheet\" href=\"/static/pico.min.css\"><link rel=\"stylesheet\" href=\"/static/custom.css\"><script src=\"/static/htmx.min.js\"></script><meta name=\"htmx-config\" content=\"{code:&#34;.*&#34;, swap:true},\"></head><body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!doctype html><html lang=\"en\"><head><link rel=\"stylesheet\" href=\"/static/pico.min.css\"><link rel=\"stylesheet\" href=\"/static/pico.colors.min.css\"><link rel=\"stylesheet\" href=\"/static/custom.css\"><script src=\"/static/htmx.min.js\"></script><meta name=\"htmx-config\" content=\"{code:&#34;.*&#34;, swap:true},\"><meta name=\"color-scheme\" content=\"light dark\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

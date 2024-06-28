@@ -22,11 +22,12 @@ type Lap struct {
 }
 
 type Driver struct {
-	Firstname string
-	Lastname  string
-	Shortname string
-	Vehicle   string
-	Laps      []Lap
+	Firstname  string
+	Lastname   string
+	Shortname  string
+	Vehicle    string
+	FastestLap uint
+	Laps       []Lap
 }
 
 /*

@@ -140,9 +140,12 @@ func (s SqlLite) AddDriver(driver *Driver) error {
 	return nil
 }
 
-//func (s SqlLite) GetDriverInRace(raceID uint) (driver []Driver, err error) {
-//s.db.Where()
-//}
+func (s SqlLite) GetLapsForDriver(driverID uint) (laps []Lap, err error) {
+	if result := s.db.Where(&Lap{DriverID: driverID}).Find(&laps); result.Error != nil {
+		return nil, result.Error
+	}
+	return laps, nil
+}
 
 func (s SqlLite) GetDriver(ID uint) (driver *Driver, err error) {
 	if result := s.db.First(driver, ID); result.Error != nil {

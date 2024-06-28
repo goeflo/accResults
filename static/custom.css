@@ -5,3 +5,7 @@
 li:hover {
     cursor: pointer;
 }
+
+.fastest_lap {
+    background-color: red;
+}

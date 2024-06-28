@@ -6,7 +6,7 @@ import (
 )
 
 templ MakeIndexPage(races []database.Race) {
-        <table>
+        <table class="striped">
             <thead>
                 <tr>
                     <th></th>
@@ -19,7 +19,7 @@ templ MakeIndexPage(races []database.Race) {
             </thead>
             <tbody>
                 for _, race := range races {
-                    <tr class="striped" class="clickable" hx-target="#content" hx-post={fmt.Sprintf("/details/%d", race.ID)}>
+                    <tr class="clickable" hx-target="#content" hx-post={fmt.Sprintf("/details/%d", race.ID)}>
                         <td>
                             
                             <img src="/static/info.png" width="40" heigh="40">
@@ -44,9 +44,12 @@ templ MakeIndex(races []database.Race) {
 
     <head>
         <link rel="stylesheet" href="/static/pico.min.css" />
+        <link rel="stylesheet" href="/static/pico.colors.min.css" />
         <link rel="stylesheet" href="/static/custom.css" />
         <script src="/static/htmx.min.js" />
         <meta name="htmx-config" content='{code:".*", swap:true},'  />
+        <meta name="color-scheme" content="light dark" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
     </head>
 
     <body>
