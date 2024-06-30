@@ -28,6 +28,14 @@ templ MakeDetailsLaps(race *database.Race, drivers []model.Driver) {
 
     <h2>laps</h2>
 
+    for _, driver := range drivers {
+            for _, lap := range driver.Laps {
+                if lap.FastestLapInRace {
+                    <p> { fmt.Sprintf("fastest lap: %s by %s %s (%s)", lap.Time, driver.Firstname, driver.Lastname,driver.Vehicle) }</p>
+                }
+        }
+    }
+
     <p>
     for _, driver := range drivers {
         <details>
@@ -47,18 +55,37 @@ templ MakeDetailsLaps(race *database.Race, drivers []model.Driver) {
                         for i, lap := range driver.Laps {
 
                             <tr>
-                            if i == int(driver.FastestLap) {
+                            
+                            if lap.FastestLapInRace {
+                                <td class="pico-color-purple-600"><b>{ fmt.Sprintf("%v", lap.Lap) }</b></td>
+                            } else if i == int(driver.FastestLap) {
                                 <td class="pico-color-green-600"><b>{ fmt.Sprintf("%v", lap.Lap) }</b></td>
                             } else {
                                 <td>{ fmt.Sprintf("%v", lap.Lap) }</td>
                             }
-                            <td>{ fmt.Sprintf("%v", lap.Time) }</td>
+                            
+                            if lap.FastestLapInRace {
+                                <td class="pico-color-purple-600"><b>{ fmt.Sprintf("%v", lap.Time) }</b></td>
+                            } else if i == int(driver.FastestLap) {
+                                <td class="pico-color-green-600"><b>{ fmt.Sprintf("%v", lap.Time) }</b></td>
+                            } else {
+                                <td>{ fmt.Sprintf("%v", lap.Time) }</td>
+                            }
+
                             <td>{ fmt.Sprintf("%v", lap.Sector1) }</td>
                             <td>{ fmt.Sprintf("%v", lap.Sector2) }</td>
                             <td>{ fmt.Sprintf("%v", lap.Sector3) }</td>
                             </tr>
                         
                         }
+
+                        <tr>
+                            <td>average</td>
+                            <td>{ fmt.Sprintf("%v", driver.LapTimeAverage) }</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
                     </tbody>
                 </table>
             </p>

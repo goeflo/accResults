@@ -40,21 +40,23 @@ type LeaderBoard struct {
 
 type Driver struct {
 	gorm.Model
-	CarID     uint `gorm:"index"`
-	FirstName string
-	LastName  string
-	ShortName string
-	PlayerID  string
+	CarID          uint `gorm:"index"`
+	FirstName      string
+	LastName       string
+	ShortName      string
+	PlayerID       string
+	LapTimeAverage uint
 }
 
 type Lap struct {
 	gorm.Model
-	CarID    uint
-	DriverID uint
-	Laptime  uint
-	IsValid  bool
-	Splits   string
-	Split1   uint
-	Split2   uint
-	Split3   uint
+	CarID            uint
+	DriverID         uint
+	Laptime          uint
+	IsValid          bool
+	FastestLapInRace bool
+	Splits           string
+	Split1           uint
+	Split2           uint
+	Split3           uint
 }

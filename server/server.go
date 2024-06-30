@@ -92,19 +92,21 @@ func handleDetailsLaps(db database.SqlLite) func(http.ResponseWriter, *http.Requ
 				return
 			}
 			mdriver := model.Driver{
-				Firstname: driver.FirstName,
-				Lastname:  driver.LastName,
-				Shortname: driver.ShortName,
-				Vehicle:   data.Cars[car.CarModel].Name,
+				Firstname:      driver.FirstName,
+				Lastname:       driver.LastName,
+				Shortname:      driver.ShortName,
+				Vehicle:        data.Cars[car.CarModel].Name,
+				LapTimeAverage: data.ConvertMilliseconds(driver.LapTimeAverage),
 			}
 
 			fastestLap := uint(math.MaxInt)
 			for i, lap := range laps {
 				mlap := model.Lap{
-					Lap:     uint(i + 1),
-					Sector1: data.ConvertMilliseconds(lap.Split1),
-					Sector2: data.ConvertMilliseconds(lap.Split2),
-					Sector3: data.ConvertMilliseconds(lap.Split3),
+					Lap:              uint(i + 1),
+					FastestLapInRace: lap.FastestLapInRace,
+					Sector1:          data.ConvertMilliseconds(lap.Split1),
+					Sector2:          data.ConvertMilliseconds(lap.Split2),
+					Sector3:          data.ConvertMilliseconds(lap.Split3),
 				}
 
 				if lap.IsValid && lap.Laptime < fastestLap {

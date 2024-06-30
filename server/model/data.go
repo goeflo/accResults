@@ -14,20 +14,22 @@ type Leaderboard struct {
 }
 
 type Lap struct {
-	Lap     uint
-	Time    string
-	Sector1 string
-	Sector2 string
-	Sector3 string
+	Lap              uint
+	Time             string
+	FastestLapInRace bool
+	Sector1          string
+	Sector2          string
+	Sector3          string
 }
 
 type Driver struct {
-	Firstname  string
-	Lastname   string
-	Shortname  string
-	Vehicle    string
-	FastestLap uint
-	Laps       []Lap
+	Firstname      string
+	Lastname       string
+	Shortname      string
+	Vehicle        string
+	FastestLap     uint
+	LapTimeAverage string
+	Laps           []Lap
 }
 
 /*
