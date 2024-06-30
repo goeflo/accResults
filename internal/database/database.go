@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"math"
 
 	"github.com/goeflo/accResults/internal/data"
 	"gorm.io/driver/sqlite"
@@ -36,6 +37,7 @@ func (s SqlLite) NewResult(data data.Result) (ID uint, err error) {
 
 	accCarIDToDriverID := make(map[uint]uint)
 	accCarIDToDBCarID := make(map[uint]uint)
+	averageLapTimeFroDriverID := make(map[uint][]uint)
 
 	if result := s.db.Create(&resultFile); result.Error != nil {
 		return 0, result.Error
@@ -104,21 +106,64 @@ func (s SqlLite) NewResult(data data.Result) (ID uint, err error) {
 		}
 	}
 
+	fastestLap := uint(math.MaxInt)
+	fastestLapIdx := uint(0)
 	for _, lap := range data.ResultData.Laps {
 		l := Lap{
-			CarID:    accCarIDToDBCarID[lap.CarID],
-			DriverID: accCarIDToDriverID[lap.CarID],
-			Laptime:  lap.Laptime,
-			IsValid:  lap.IsValidForBest,
-			Split1:   lap.Splits[0],
-			Split2:   lap.Splits[1],
-			Split3:   lap.Splits[2],
+			CarID:            accCarIDToDBCarID[lap.CarID],
+			DriverID:         accCarIDToDriverID[lap.CarID],
+			Laptime:          lap.Laptime,
+			IsValid:          lap.IsValidForBest,
+			FastestLapInRace: false,
+			Split1:           lap.Splits[0],
+			Split2:           lap.Splits[1],
+			Split3:           lap.Splits[2],
 		}
 		if result := s.db.Create(&l); result.Error != nil {
 			log.Printf("error adding new lap %v, %v\n", l, result.Error)
 			return 0, result.Error
 		}
+		if lap.IsValidForBest && lap.Laptime < fastestLap {
+			fastestLap = lap.Laptime
+			fastestLapIdx = l.ID
+		}
+
+		if lap.IsValidForBest {
+			avgLapTime := averageLapTimeFroDriverID[accCarIDToDriverID[lap.CarID]]
+			avgLapTime = append(avgLapTime, lap.Laptime)
+			averageLapTimeFroDriverID[accCarIDToDriverID[lap.CarID]] = avgLapTime
+		}
+
 	}
+
+	for driverID, avgLapTime := range averageLapTimeFroDriverID {
+		driver := Driver{}
+		s.db.First(&driver, driverID)
+
+		calculatedAcgLapTime := uint(0)
+		for i := range avgLapTime {
+			calculatedAcgLapTime += avgLapTime[i]
+		}
+		calculatedAcgLapTime = calculatedAcgLapTime / uint(len(avgLapTime))
+
+		driver.LapTimeAverage = calculatedAcgLapTime
+		if result := s.db.Save(&driver); result.Error != nil {
+			log.Printf("error updating avg lapt time for driver %v %v\n", driver.ID, result.Error)
+			return 0, result.Error
+		}
+	}
+
+	if fastestLapIdx != 0 {
+		lap := Lap{}
+		s.db.First(&lap, fastestLapIdx)
+		lap.FastestLapInRace = true
+
+		if result := s.db.Save(&lap); result.Error != nil {
+			log.Printf("error updating flastest lap lapIdx %v %v\n", fastestLapIdx, result.Error)
+			return 0, result.Error
+		}
+	}
+
 	return resultFile.ID, nil
 }
 
